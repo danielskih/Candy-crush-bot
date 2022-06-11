@@ -1,5 +1,5 @@
-# HO_game_bot
-An hidden object game bot
+
+# Candy crush game bot
 
 Create the environment from the environment.yml file:	conda env create -f environment. yml. 
 
