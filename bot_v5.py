@@ -46,26 +46,21 @@ class Match():
         self.typ = typ
         # obstacles = np.empty([1,1])
 
-def find_match(selected): 
-    
-    '''Takes Series as an input, returns index of a match3 in the series if there is, else: None'''
-    
+def find_match(selected):   
+    '''Takes Series as an input, returns index of a match3 in the series if there is, else: None'''    
     match=[i for i in selected.index]
     diff = [1]+[i-j for j,i in zip(match[:-1], match[1:])]
     diff = np.absolute(np.array(diff)) 
     mask = diff == 1
     if selected[mask].size>=3:
         return list(selected[mask].index)
-
     return 
 
 def move_to(global_board, fr, to):
-
     '''Takes a Dataframe, and two lists of row/col values, swaps values in specified cells. 
         Outputs resulting Data frame '''
     local_board=global_board.copy()
     local_board.loc[fr[0], fr[1]], local_board.loc[to[0], to[1]] = local_board.loc[to[0], to[1]], local_board.loc[fr[0], fr[1]]
-
     return local_board
 
 def generate_children(global_board, pos):
@@ -75,9 +70,9 @@ def generate_children(global_board, pos):
     positions = np.array(pos)
     directions = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
     moves = np.add(positions, directions)
-    # Filter the values outside of the local_board
-    moves = moves[(0<=moves[:,0]) & (moves[:,0]< board_w)]
-    moves = moves[(0<=moves[:,1]) & (moves[:,1]< board_h)]
+    # # Filter the values outside of the local_board
+    # moves = moves[(0<=moves[:,0]) & (moves[:,0]< board_w)]
+    # moves = moves[(0<=moves[:,1]) & (moves[:,1]< board_h)]
     # Filter the legal_tiles moves and save them in a children nodes attribute
     children=[]
     for move in moves:
@@ -85,7 +80,6 @@ def generate_children(global_board, pos):
             local_board = move_to(global_board, pos, move)
             m = GameState(local_board, None, frm=pos, at=move)
             children.append(m)
-
     return children
 
 def select_type(typ, board, ind=None, col=None):
@@ -109,7 +103,6 @@ def pix_avg(pix_array):
 #### Get input for board height and width.
 
 board_w = int(input('Borad width is:  '))
-
 board_h = int(input('Borad height is: '))
 
 # wanted = input('Enter the color and amount of the wanted tiles, e.g. red, blue, orange, violet, green followed by number.')
@@ -128,16 +121,9 @@ blue = Imag.open('Images/candy_blue.png')
 orange = Imag.open('Images/candy_orange.png')
 obstacle = Imag.open('Images/obstacle_1.png')
 red = Imag.open('Images/candy_red.png')
-# fig = plt.figure(figsize=(10, 7))
-# rows =1
-# columns =5
-# count=0
-# for im in [orange, green, violet, blue, np.array(obstacle)]:
-#     count+=1
-#     fig.add_subplot(rows, columns, count)
-#     plt.imshow(im)   
+  
 
-# Get mean RGB values
+# Get average RGB values
 blue_mean = pix_avg(blue)
 orange_mean = pix_avg(orange)
 violet_mean = pix_avg(violet)
@@ -149,7 +135,7 @@ candy_rgb = pd.DataFrame([green_mean, blue_mean, violet_mean, orange_mean, obsta
 
 all_tiles = list(product(range(board_h),range(board_w)))
 
-#### Create a dictionary of coordinates for mouse drags.
+# Create a dictionary of coordinates for mouse drags.
 
 game_scr_size =  board_w * tile_w, board_h * tile_h
 corner = screensize[1]*2 - game_scr_size[1]
@@ -283,6 +269,8 @@ while True:
             main_candidate_horiz.super = True
 
         main_candidate_horiz.score += sum_score(main_candidate_horiz)
+        if main_candidate_horiz.super == True:
+            main_candidate_horiz.score *= 1.5
         selected.append(main_candidate_horiz)
 
 
@@ -292,6 +280,8 @@ while True:
             main_candidate_vert.super = True
 
         main_candidate_vert.score += sum_score(main_candidate_vert)
+        if main_candidate_vert.super == True:
+            main_candidate_vert.score *= 1.5
         selected.append(main_candidate_vert)
 
     best = max(selected, key = lambda x: x.score)
